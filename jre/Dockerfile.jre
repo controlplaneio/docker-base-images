@@ -1,0 +1,21 @@
+FROM controlplane/base:latest
+
+LABEL io.k8s.description="ControlPlane base JRE image" \
+      io.k8s.display-name="ControlPlane base JRE"
+
+ENV JAVA_HOME="/usr/lib/jvm/java-openjdk/" \
+    APP_HOME="/code"
+
+USER root
+
+RUN \
+    apk \
+      add \
+      --no-cache \
+      --repository "http://dl-3.alpinelinux.org/alpine/edge/main" \
+      --repository "http://dl-3.alpinelinux.org/alpine/edge/community" \
+      --repository "http://dl-3.alpinelinux.org/alpine/edge/testing" \
+      \
+      'openjdk8-jre>8.131'
+
+USER user

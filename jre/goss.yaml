@@ -1,0 +1,9 @@
+command:
+  java -version:
+    title: Checking Java JRE version and architecture
+    exit-status: 0
+    stdout: []
+    stderr:
+    - /^openjdk version "1.8.*/
+    - /^OpenJDK 64-Bit Server VM .*/
+    timeout: 1000

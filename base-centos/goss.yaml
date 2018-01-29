@@ -1,0 +1,5 @@
+file:
+  /etc/redhat-release:
+    exists: true
+    contains:
+    - /^CentOS Linux release 7.*/

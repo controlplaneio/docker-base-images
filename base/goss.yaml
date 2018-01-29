@@ -1,0 +1,9 @@
+file:
+  /etc/alpine-release:
+    exists: true
+    filetype: file
+    contains:
+    - "3.6.2"
+  /etc/os-release:
+    exists: true
+    filetype: file
