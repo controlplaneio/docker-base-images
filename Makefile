@@ -115,6 +115,14 @@ test-jre: ## test base JRE centos image
 
 # ---
 
+.PHONY: pull
+pull: ## pull all base images
+	@echo "+ $@"
+	@echo "Pulling base images..."
+	grep FROM Dockerfile* **/Dockerfile* 2>/dev/null | awk '{print $$2}' | xargs -n 1 docker pull
+
+# ---
+
 .PHONY: push
 push: ## push all base images
 	@echo "+ $@"

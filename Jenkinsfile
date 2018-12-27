@@ -17,7 +17,7 @@ pipeline {
 
       steps {
         ansiColor('xterm') {
-          sh 'make build'
+          sh 'make pull build'
           sh 'make test'
         }
       }
