@@ -15,7 +15,11 @@ CONTAINER_TAG ?= $(GIT_SHA)
 CONTAINER_TAG = latest
 
 CONTAINER_NAME_BASE := $(REGISTRY)/$(NAME):$(CONTAINER_TAG)
+
+CONTAINER_NAME_BASE_UBUNTU := $(REGISTRY)/$(NAME)-ubuntu:$(CONTAINER_TAG)
+CONTAINER_NAME_BASE_ALPINE := $(REGISTRY)/$(NAME)-alpine:$(CONTAINER_TAG)
 CONTAINER_NAME_BASE_CENTOS := $(REGISTRY)/$(NAME)-centos:$(CONTAINER_TAG)
+
 CONTAINER_NAME_JRE := $(REGISTRY)/$(NAME)-jre:$(CONTAINER_TAG)
 CONTAINER_NAME_TEST := $(REGISTRY)-$(NAME)-test-$(CONTAINER_TAG)
 
@@ -59,20 +63,27 @@ endef
 build: build-all ## build all base images
 
 .PHONY: build-all
-build-all: build-base ## build all base images
+build-all: build-base-ubuntu ## build all base images
 	@echo "+ $@"
 	make \
 		--jobs 2 \
 		--max-load 3 \
 		--output-sync=recurse \
 		\
-		build-base-centos \
+		build-base-alpine \
+		build-base-centos
+	make \
 		build-jre
 
-.PHONY: build-base
-build-base: ## build base alpine image
+.PHONY: build-base-ubuntu
+build-base-ubuntu: ## build ubuntu base image
 	@echo "+ $@"
-	$(call build_image,$(CONTAINER_NAME_BASE),base/Dockerfile.base)
+	$(call build_image,$(CONTAINER_NAME_BASE_UBUNTU),base-ubuntu/Dockerfile.base-ubuntu)
+
+.PHONY: build-base-alpine
+build-base-alpine: ## build base alpine image
+	@echo "+ $@"
+	$(call build_image,$(CONTAINER_NAME_BASE_ALPINE),base-alpine/Dockerfile.base-alpine)
 
 .PHONY: build-base-centos
 build-base-centos: ## build base centos image
@@ -80,7 +91,7 @@ build-base-centos: ## build base centos image
 	$(call build_image,$(CONTAINER_NAME_BASE_CENTOS),base-centos/Dockerfile.base-centos)
 
 .PHONY: build-jre
-build-jre: ## build base JRE centos image
+build-jre: ## build base JRE alpine image
 	@echo "+ $@"
 	$(call build_image,$(CONTAINER_NAME_JRE),jre/Dockerfile.jre)
 
@@ -96,7 +107,7 @@ test: ## test all base images
 		test-all
 
 .PHONY: test-all
-test-all: test-base test-base-centos test-jre  ## test all base images
+test-all: test-base test-ubuntu test-alpine test-centos test-jre  ## test all base images
 
 .PHONY: test-base
 test-base: ## test base alpine image

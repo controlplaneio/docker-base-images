@@ -1,4 +1,4 @@
-FROM controlplane/base:latest
+FROM controlplane/base-alpine:latest
 
 LABEL io.k8s.description="ControlPlane base JRE image" \
       io.k8s.display-name="ControlPlane base JRE"
