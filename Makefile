@@ -35,6 +35,7 @@ all: build test ## build and test all base images
 
 define build_image
 	set -x;
+	docker run --rm -i hadolint/hadolint < $(2) | grep --color=always '.*'
 	docker build \
 	    --tag "$(1)" \
 			--rm=true \
