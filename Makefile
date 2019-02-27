@@ -107,12 +107,17 @@ test: ## test all base images
 		test-all
 
 .PHONY: test-all
-test-all: test-base test-ubuntu test-alpine test-centos test-jre  ## test all base images
+test-all: test-base-ubuntu test-base-alpine test-base-centos test-base-jre  ## test all base images
 
-.PHONY: test-base
+.PHONY: test-base-ubuntu
+test-base-ubuntu: ## test base ubuntu image
+	@echo "+ $@"
+	$(call test_image,base-ubuntu,$(CONTAINER_NAME_BASE_UBUNTU))
+
+.PHONY: test-base-alpine
 test-base: ## test base alpine image
 	@echo "+ $@"
-	$(call test_image,base,$(CONTAINER_NAME_BASE))
+	$(call test_image,base-alpine,$(CONTAINER_NAME_BASE_ALPINE))
 
 .PHONY: test-base-centos
 test-base-centos: ## test base centos image

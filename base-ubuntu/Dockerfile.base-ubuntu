@@ -5,17 +5,24 @@ LABEL io.k8s.description="control-plane.io base image" \
 
 ENV GOSS_VERSION="v0.3.6"
 
-RUN adduser -h /home/user -s /bin/sh -D user
+RUN adduser --home /home/user --shell /bin/sh --disabled-login --gecos "" user
 
 WORKDIR /home/user
 
 USER root
 
-# TODO: APK del curl from this image
 RUN \
   DEBIAN_FRONTEND=noninteractive \
     apt update && apt install --assume-yes --no-install-recommends \
       ca-certificates \
+      curl \
+  \
+  && curl --fail -L "https://github.com/aelsabbahy/goss/releases/download/${GOSS_VERSION}/goss-linux-amd64" \
+  -o /usr/local/bin/goss \
+  && chmod +rx /usr/local/bin/goss \
+  \
+  && apt remove --assume-yes \
+    curl \
   \
   && rm -rf /var/lib/apt/lists/*
 
