@@ -1,4 +1,4 @@
-FROM centos:7
+FROM centos:latest
 
 LABEL io.k8s.description="ControlPlane base CentOS image" \
       io.k8s.display-name="ControlPlane base CentOS "

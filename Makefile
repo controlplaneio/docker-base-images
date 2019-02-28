@@ -23,6 +23,21 @@ CONTAINER_NAME_BASE_CENTOS := $(REGISTRY)/$(NAME)-centos:$(CONTAINER_TAG)
 CONTAINER_NAME_JRE := $(REGISTRY)/$(NAME)-jre:$(CONTAINER_TAG)
 CONTAINER_NAME_TEST := $(REGISTRY)-$(NAME)-test-$(CONTAINER_TAG)
 
+BUILD_JOBS_BASE :=  build-base-alpine \
+										build-base-centos \
+										build-base-ubuntu
+BUILD_JOBS_INHERITED := build-jre
+
+TEST_JOBS_BASE :=   test-base-alpine \
+										test-base-centos \
+										test-base-ubuntu \
+										test-jre
+
+PUSH_JOBS_BASE :=   push-base-alpine \
+										push-base-centos \
+										push-base-ubuntu \
+										push-jre
+
 export NAME REGISTRY BUILD_DATE GIT_SHA GIT_TAG GIT_MESSAGE CONTAINER_NAME CONTAINER_TAG
 
 # ---
@@ -58,23 +73,22 @@ define push_image
 		docker push $(1)
 endef
 
+define make_parallel
+	make \
+  		--jobs 2 \
+  		--max-load 3 \
+  		--output-sync=recurse \
+  		\
+  		$(1)
+endef
+
 # ---
 
 .PHONY: build
-build: build-all ## build all base images
-
-.PHONY: build-all
-build-all: build-base-ubuntu ## build all base images
+build: ## build all base images
 	@echo "+ $@"
-	make \
-		--jobs 2 \
-		--max-load 3 \
-		--output-sync=recurse \
-		\
-		build-base-alpine \
-		build-base-centos
-	make \
-		build-jre
+	$(call make_parallel,$(BUILD_JOBS_BASE))
+	$(call make_parallel,$(BUILD_JOBS_INHERITED))
 
 .PHONY: build-base-ubuntu
 build-base-ubuntu: ## build ubuntu base image
@@ -92,7 +106,7 @@ build-base-centos: ## build base centos image
 	$(call build_image,$(CONTAINER_NAME_BASE_CENTOS),base-centos/Dockerfile.base-centos)
 
 .PHONY: build-jre
-build-jre: ## build base JRE alpine image
+build-jre: ## build JRE image
 	@echo "+ $@"
 	$(call build_image,$(CONTAINER_NAME_JRE),jre/Dockerfile.jre)
 
@@ -101,14 +115,7 @@ build-jre: ## build base JRE alpine image
 .PHONY: test
 test: ## test all base images
 	@echo "+ $@"
-	make \
-		--jobs 2 \
-		--max-load 3 \
-		--output-sync=recurse \
-		test-all
-
-.PHONY: test-all
-test-all: test-base-ubuntu test-base-alpine test-base-centos test-base-jre  ## test all base images
+	$(call make_parallel,$(TEST_JOBS_BASE))
 
 .PHONY: test-base-ubuntu
 test-base-ubuntu: ## test base ubuntu image
@@ -125,8 +132,8 @@ test-base-centos: ## test base centos image
 	@echo "+ $@"
 	$(call test_image,base-centos,$(CONTAINER_NAME_BASE_CENTOS))
 
-.PHONY: test-base-jre
-test-jre: ## test base JRE centos image
+.PHONY: test-jre
+test-jre: ## test JRE image
 	@echo "+ $@"
 	$(call test_image,jre,$(CONTAINER_NAME_JRE))
 
@@ -144,19 +151,17 @@ pull: ## pull all base images
 push: ## push all base images
 	@echo "+ $@"
 	@echo "Pushing images in parallel..."
-	make \
-		--jobs 3 \
-		--max-load 3 \
-		--output-sync=recurse \
-		push-all
+	$(call make_parallel,$(PUSH_JOBS_BASE))
 
-.PHONY: push-all
-push-all: push-base push-base-centos push-jre ## push all base images
-
-.PHONY: push-base
-push-base: ## push base alpine image
+.PHONY: push-base-ubuntu
+push-base-ubuntu: ## push ubuntu base image
 	@echo "+ $@"
-	$(call push_image,$(CONTAINER_NAME_BASE))
+	$(call push_image,$(CONTAINER_NAME_BASE_UBUNTU))
+
+.PHONY: push-base-alpine
+push-base-alpine: ## push base alpine image
+	@echo "+ $@"
+	$(call push_image,$(CONTAINER_NAME_BASE_ALPINE))
 
 .PHONY: push-base-centos
 push-base-centos: ## push base centos image
@@ -164,10 +169,11 @@ push-base-centos: ## push base centos image
 	$(call push_image,$(CONTAINER_NAME_BASE_CENTOS))
 
 .PHONY: push-jre
-push-jre: ## push base JRE centos image
+push-jre: ## push JRE image
 	@echo "+ $@"
 	$(call push_image,$(CONTAINER_NAME_JRE))
 
+# ---
 
 .PHONY: help
 help: ## parse jobs and descriptions from this Makefile
