@@ -9,14 +9,6 @@ pipeline {
         step([$class: 'ClaimPublisher'])
       }
     }
-    failure {
-      emailext (
-          subject: "docker-base-images build failed:  '${env.BUILD_NUMBER}'",
-          body: "${currentBuild.rawBuild.getLog(100).join("\n")}",
-          to: "team@control-plane.io",
-          from: "jenkins@control-plane.io"
-          )
-    }
   }
 
   stages {
