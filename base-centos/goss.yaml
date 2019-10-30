@@ -2,4 +2,4 @@ file:
   /etc/redhat-release:
     exists: true
     contains:
-    - /^CentOS Linux release 7.*/
+    - /^CentOS Linux release 8.*/
