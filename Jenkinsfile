@@ -3,6 +3,22 @@
 pipeline {
   agent none
 
+  post {
+    always {
+      node("master") {
+        step([$class: 'ClaimPublisher'])
+      }
+    }
+    failure {
+      emailext (
+          subject: "docker-base-images build failed:  '${env.BUILD_NUMBER}'",
+          body: "${currentBuild.rawBuild.getLog(100).join("\n")}",
+          to: "team@control-plane.io",
+          from: "jenkins@control-plane.io"
+          )
+    }
+  }
+
   stages {
     stage('Test') {
       agent {
