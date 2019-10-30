@@ -14,7 +14,7 @@ RUN \
     set -x; \
     \
     yum \
-      -yt \
+      -y \
       upgrade \
     \
     && curl --fail -L "https://github.com/aelsabbahy/goss/releases/download/${GOSS_VERSION}/goss-linux-amd64" \
