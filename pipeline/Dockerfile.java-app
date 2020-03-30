@@ -62,19 +62,21 @@ COPY goss-java-app.yaml goss-java-app.yaml
 RUN goss -g - validate < goss-java-app.yaml
 
 #####################################################
-FROM package as VulCheck
+FROM package as vulcheck
 
+USER root
 ARG token=token
 ADD https://get.aquasec.com/microscanner .
-USER root
+RUN yum install -y ca-certificates
 RUN chmod +x microscanner
 USER user
-RUN ./microscanner $token
+RUN ./microscanner $token > cve-report.txt
 
 
 #####################################################
 FROM package as final
 
+COPY --from=vulcheck  /home/user/cve-report.txt /home/user/cve-report.txt
 ARG vcs_ref=unespecied
 LABEL org.label-schema.name="SpringBoot Test App" \
       org.label-schema.description="Control Plane SpringBoot Test App" \
