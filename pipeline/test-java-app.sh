@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+set -o pipefail;
+
+# Check for Vulnerabilities
+docker run -it --rm -v ~/.cache:/root/.cache/ aquasec/trivy --exit-code 1 --severity HIGH,CRITICAL controlplane/javatest
+
+
 # Create network
 docker network create -d bridge testing > /dev/null 2>&1
 
