@@ -1,0 +1,9 @@
+command:
+  java -jar /home/user/gs-spring-boot-0.1.0.jar:
+    title: SpringBoot Application
+    exit-status: 0
+    stdout:
+    - /^Starting Application v0.1.*/
+    - "Tomcat initialized with port(s): 8080 (http)"
+    stderr: []
+    timeout: 30000

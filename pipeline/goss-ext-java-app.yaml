@@ -1,0 +1,7 @@
+http:
+  http://javaapp:8080:
+    status: 200
+    allow-insecure: false
+    no-follow-redirects: true
+    timeout: 5000
+    body: []

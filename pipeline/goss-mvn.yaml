@@ -1,0 +1,8 @@
+command:
+  mvn -version:
+    title: Apache Maven 3.6.0
+    exit-status: 0
+    stdout:
+    - /^Apache Maven 3.6.*/
+    stderr: []
+    timeout: 1000
