@@ -1,28 +1,36 @@
-FROM centos:latest
+ARG BASE_IMAGE_TAG=":latest"
+FROM centos${BASE_IMAGE_TAG}
 
 LABEL io.k8s.description="ControlPlane base CentOS image" \
       io.k8s.display-name="ControlPlane base CentOS "
 
-ENV GOSS_VERSION="v0.3.6"
+ENV GOSS_VERSION="v0.3.10"
 
-RUN useradd --create-home -s /bin/bash user
 
 WORKDIR /home/user
+
+# no yum update
+#     yum update \
+#         --assumeyes \
+#         --setopt=tsflags=nodocs \
+#         --skip-broken \
+#       \
+
 
 USER root
 RUN \
     set -x; \
     \
-    yum \
-      -y \
-      upgrade \
-    \
-    && curl --fail -L "https://github.com/aelsabbahy/goss/releases/download/${GOSS_VERSION}/goss-linux-amd64" \
-    -o /usr/local/bin/goss \
+    curl --fail -L "https://github.com/aelsabbahy/goss/releases/download/${GOSS_VERSION}/goss-linux-amd64" \
+      -o /usr/local/bin/goss \
     && chmod +rx /usr/local/bin/goss \
     \
     && rm -rf /var/cache/yum \
-    && yum \
-      clean all
+    && yum clean all
+
+
+RUN \
+    groupadd --system --gid 30000 user && \
+    useradd --system --shell /sbin/nologin --uid 30000 --gid 30000 user
 
 USER user

@@ -21,22 +21,31 @@ CONTAINER_NAME_BASE_ALPINE := $(REGISTRY)/$(NAME)-alpine:$(CONTAINER_TAG)
 CONTAINER_NAME_BASE_CENTOS := $(REGISTRY)/$(NAME)-centos:$(CONTAINER_TAG)
 
 CONTAINER_NAME_JRE := $(REGISTRY)/$(NAME)-jre:$(CONTAINER_TAG)
+CONTAINER_NAME_ECHOSERVER := $(REGISTRY)/$(NAME)-echoserver:$(CONTAINER_TAG)
 CONTAINER_NAME_TEST := $(REGISTRY)-$(NAME)-test-$(CONTAINER_TAG)
 
-BUILD_JOBS_BASE :=  build-base-alpine \
-										build-base-centos \
-										build-base-ubuntu
-BUILD_JOBS_INHERITED := build-jre
+BUILD_JOBS_BASE := \
+	build-base-alpine \
+	build-base-centos \
+	build-base-ubuntu
 
-TEST_JOBS_BASE :=   test-base-alpine \
-										test-base-centos \
-										test-base-ubuntu \
-										test-jre
+BUILD_JOBS_INHERITED := \
+	build-jre \
+	build-echoserver
 
-PUSH_JOBS_BASE :=   push-base-alpine \
-										push-base-centos \
-										push-base-ubuntu \
-										push-jre
+TEST_JOBS_ALL :=  \
+ 	test-base-alpine \
+	test-base-centos \
+	test-base-ubuntu \
+	test-jre \
+	test-echoserver
+
+PUSH_JOBS_ALL := \
+	push-base-alpine \
+	push-base-centos \
+	push-base-ubuntu \
+	push-jre \
+	push-echoserver
 
 export NAME REGISTRY BUILD_DATE GIT_SHA GIT_TAG GIT_MESSAGE CONTAINER_NAME CONTAINER_TAG
 
@@ -50,22 +59,37 @@ all: build test ## build and test all base images
 
 define build_image
 	set -x;
-	docker run --rm -i hadolint/hadolint < $(2) | grep --color=always '.*'
-	docker build \
-	    --tag "$(1)" \
+#	docker run --rm -i hadolint/hadolint < $(2) | grep --color=always '.*'
+	BASE_IMAGE_TAG=$(BASE_IMAGE_TAG); \
+		docker build \
+			--tag "$(1)" \
 			--rm=true \
 			--file=$(2) \
+			--build-arg BASE_IMAGE_TAG="$${BASE_IMAGE_TAG}" \
 			.
 endef
 
 define test_image
 	cd $(1)/ \
 	&& [ -f goss.yaml ] || { echo "error: goss.yaml not found"; exit 1; } \
-	&& docker \
-		run \
-		-i \
+	&& docker run -i $(2) \
+		goss \
+			-g - \
+			validate \
+			--format documentation \
+			< goss.yaml
+endef
+
+define test_image_using_entrypoint
+	cd $(1)/ \
+	&& [ -f goss.yaml ] || { echo "error: goss.yaml not found"; exit 1; } \
+	&& docker run -i \
+		--entrypoint=goss \
 		$(2) \
-		goss -g - validate < goss.yaml
+			-g - \
+			validate \
+			--format documentation \
+			< goss.yaml
 endef
 
 define push_image
@@ -110,12 +134,17 @@ build-jre: ## build JRE image
 	@echo "+ $@"
 	$(call build_image,$(CONTAINER_NAME_JRE),jre/Dockerfile.jre)
 
+.PHONY: build-echoserver
+build-echoserver: ## build echoserver image
+	@echo "+ $@"
+	$(call build_image,$(CONTAINER_NAME_ECHOSERVER),echoserver/Dockerfile.echoserver)
+
 # ---
 
 .PHONY: test
 test: ## test all base images
 	@echo "+ $@"
-	$(call make_parallel,$(TEST_JOBS_BASE))
+	$(call make_parallel,$(TEST_JOBS_ALL))
 
 .PHONY: test-base-ubuntu
 test-base-ubuntu: ## test base ubuntu image
@@ -137,6 +166,11 @@ test-jre: ## test JRE image
 	@echo "+ $@"
 	$(call test_image,jre,$(CONTAINER_NAME_JRE))
 
+.PHONY: test-echoserver
+test-echoserver: ## test ECHOSERVER image
+	@echo "+ $@"
+	$(call test_image_using_entrypoint,echoserver,$(CONTAINER_NAME_ECHOSERVER))
+
 # ---
 
 .PHONY: pull
@@ -151,7 +185,7 @@ pull: ## pull all base images
 push: ## push all base images
 	@echo "+ $@"
 	@echo "Pushing images in parallel..."
-	$(call make_parallel,$(PUSH_JOBS_BASE))
+	$(call make_parallel,$(PUSH_JOBS_ALL))
 
 .PHONY: push-base-ubuntu
 push-base-ubuntu: ## push ubuntu base image
@@ -172,6 +206,11 @@ push-base-centos: ## push base centos image
 push-jre: ## push JRE image
 	@echo "+ $@"
 	$(call push_image,$(CONTAINER_NAME_JRE))
+
+.PHONY: push-echoserver
+push-echoserver: ## push ECHOSERVER image
+	@echo "+ $@"
+	$(call push_image,$(CONTAINER_NAME_ECHOSERVER))
 
 # ---
 

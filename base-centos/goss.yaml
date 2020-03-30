@@ -3,3 +3,16 @@ file:
     exists: true
     contains:
     - /^CentOS Linux release 8.*/
+user:
+  user:
+    exists: true
+    uid: 30000
+    gid: 30000
+    groups:
+      - user
+    home:
+    shell: /sbin/nologin
+group:
+  user:
+    exists: true
+    gid: 30000
