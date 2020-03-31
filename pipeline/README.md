@@ -66,3 +66,12 @@ In our case we have a docker image that contains `goss` where we can mount the t
 ## Why do you do it this way?
 
 We want to fail early, so, if a test stage fails, the docker build will fail as well. We don't build an image that doesn't pass the tests. As simple as that. Yes, adding all these stages might seem a nuisance, but once you get used to the pattern it gets as any other unit testing of any other language.
+
+## One more thing... Let's talk a bit about security
+
+Following our philosophy of "Fail fast", we have added a vulnerability checking stage where we verify the image. Now, there are many tools to do vulnerability scanning and we just wanted to illustrate the pattern, so, we have two methods:
+
+* Vulnerability scanning while building the docker image using Aquasec [microscanner](https://github.com/aquasecurity/microscanner).
+* Vulnerability scanning of an already built docker image using Aquasec [trivy](https://github.com/aquasecurity/trivy).
+
+The first case coould be, as we said, when you want to fail a build if the image contains vulnerabilities above certain threshold: "We don't build images that have vulnerabilities", the other one would be scanning built images, for example, you could add that in your promotion pipeline or to scan your Docker registry.
