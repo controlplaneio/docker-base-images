@@ -1,4 +1,3 @@
-
 FROM centos:8.1.1911 as base
 
 RUN useradd --create-home -s /bin/bash user
@@ -14,6 +13,7 @@ USER user
 
 
 #####################################################
+
 FROM base as test
 
 ENV GOSS_VERSION="v0.3.6"
@@ -23,14 +23,15 @@ RUN \
     \
     curl --fail -L "https://github.com/aelsabbahy/goss/releases/download/${GOSS_VERSION}/goss-linux-amd64" \
     -o /usr/local/bin/goss \
-    && chmod +rx /usr/local/bin/goss 
-  
+    && chmod +rx /usr/local/bin/goss
+
 USER user
 COPY goss-base.yaml goss.yaml
 RUN goss -g - validate < goss.yaml
 
 
 #####################################################
+
 FROM base as final
 ARG vcs_ref=unespecied
 LABEL org.label-schema.name="Control Plane Base CenOS image" \
