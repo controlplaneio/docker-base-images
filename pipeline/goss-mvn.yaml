@@ -5,4 +5,4 @@ command:
     stdout:
     - /^Apache Maven 3.6.*/
     stderr: []
-    timeout: 1000
+    timeout: 3000

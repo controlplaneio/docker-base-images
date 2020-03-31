@@ -36,30 +36,28 @@ RUN \
   
 USER user
 COPY goss-base.yaml goss-base.yaml
-COPY goss-jdk.yaml goss-jdk.yaml
 COPY goss-mvn.yaml goss-mvn.yaml
 
 
 # First we test the dependencies/parent image
 RUN goss -g - validate < goss-base.yaml
-RUN goss -g - validate < goss-jdk.yaml
 RUN goss -g - validate < goss-mvn.yaml
 
 #####################################################
-#FROM package as appTest
-#
-#ENV GOSS_VERSION="v0.3.6"
-#USER root
-#RUN \
-#    set -x; \
-#    \
-#    curl --fail -L "https://github.com/aelsabbahy/goss/releases/download/${GOSS_VERSION}/goss-linux-amd64" \
-#    -o /usr/local/bin/goss \
-#    && chmod +rx /usr/local/bin/goss 
-#  
-#USER user
-#COPY goss-java-app.yaml goss-java-app.yaml
-#RUN goss -g - validate < goss-java-app.yaml
+FROM package as appTest
+
+ENV GOSS_VERSION="v0.3.6"
+USER root
+RUN \
+   set -x; \
+   \
+   curl --fail -L "https://github.com/aelsabbahy/goss/releases/download/${GOSS_VERSION}/goss-linux-amd64" \
+   -o /usr/local/bin/goss \
+   && chmod +rx /usr/local/bin/goss 
+ 
+USER user
+COPY goss-jdk.yaml goss-jdk.yaml
+RUN goss -g - validate < goss-jdk.yaml
 
 #####################################################
 FROM package as vulcheck
@@ -67,7 +65,6 @@ FROM package as vulcheck
 USER root
 ARG token=token
 ADD https://get.aquasec.com/microscanner .
-RUN yum install -y ca-certificates
 RUN chmod +x microscanner
 USER user
 RUN ./microscanner $token > cve-report.txt

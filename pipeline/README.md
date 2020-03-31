@@ -3,7 +3,7 @@
 One of the more common questions we get is `How do you test a Docker image?` which is a very fair question. However, why testing a docker image should be different than testing any other piece of code? In our code we usully have unit tests that validate that the code does what it should do. Those tests are run as part of the build process. Right, how do we add unti tests to our Docker images? by doing two things:
 
 * Deciding your testing framework.
-* Using a Docker multi-stage build where, yes, one of the stages is the container that will do the unit testing.
+* Using a Docker multi-stage build where **one of the stages is the container that will do the unit testing**.
 
 In our case, we have gone with [goss](https://github.com/aelsabbahy/goss) as our testing framework, and we have modified the `Dockerfile` of all out images to include unit testing.
 

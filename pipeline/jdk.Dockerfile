@@ -26,7 +26,6 @@ COPY goss-jdk.yaml goss-jdk.yaml
 
 # First we test the dependencies/parent image
 RUN goss -g - validate < goss-base.yaml
-# Now we test the currentimage
 RUN goss -g - validate < goss-jdk.yaml
 
 
