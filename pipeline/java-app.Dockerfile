@@ -3,6 +3,8 @@ FROM controlplane/mvn:3.6.3 as parent
 
 WORKDIR /home/user
 
+USER root
+
 RUN curl -OL https://github.com/spring-guides/gs-spring-boot/archive/2.1.6.RELEASE.tar.gz \
 && tar -xzf 2.1.6.RELEASE.tar.gz \
 && mv gs-spring-boot-2.1.6.RELEASE myapp \
@@ -12,14 +14,17 @@ RUN curl -OL https://github.com/spring-guides/gs-spring-boot/archive/2.1.6.RELEA
 	-DskipTests \
 	-Dmaven.gitcommitid.skip \
 	-Dmaven.exec.skip=true \
-	-Dmaven.install.skip 
+	-Dmaven.install.skip \
+&& chown -R user:user /home/user
 
+USER user
 
 #####################################################
+
 FROM controlplane/openjdk:8-jdk as package
 COPY --from=parent  /home/user/myapp/complete/target/gs-spring-boot-0.1.0.jar /home/user/gs-spring-boot-0.1.0.jar
-EXPOSE 8080  
-ENTRYPOINT ["java","-jar","/home/user/gs-spring-boot-0.1.0.jar"]  
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","/home/user/gs-spring-boot-0.1.0.jar"]
 
 
 ####################################################
@@ -32,32 +37,34 @@ RUN \
     \
     curl --fail -L "https://github.com/aelsabbahy/goss/releases/download/${GOSS_VERSION}/goss-linux-amd64" \
     -o /usr/local/bin/goss \
-    && chmod +rx /usr/local/bin/goss 
-  
+    && chmod +rx /usr/local/bin/goss
+
 USER user
 COPY goss-base.yaml goss-base.yaml
+COPY goss-jdk.yaml goss-jdk.yaml
 COPY goss-mvn.yaml goss-mvn.yaml
 
 
 # First we test the dependencies/parent image
 RUN goss -g - validate < goss-base.yaml
+RUN goss -g - validate < goss-jdk.yaml
 RUN goss -g - validate < goss-mvn.yaml
 
-#####################################################
+# ####################################################
 FROM package as appTest
 
 ENV GOSS_VERSION="v0.3.6"
 USER root
 RUN \
-   set -x; \
-   \
-   curl --fail -L "https://github.com/aelsabbahy/goss/releases/download/${GOSS_VERSION}/goss-linux-amd64" \
-   -o /usr/local/bin/goss \
-   && chmod +rx /usr/local/bin/goss 
- 
+    set -x; \
+    \
+    curl --fail -L "https://github.com/aelsabbahy/goss/releases/download/${GOSS_VERSION}/goss-linux-amd64" \
+    -o /usr/local/bin/goss \
+    && chmod +rx /usr/local/bin/goss
+
 USER user
-COPY goss-jdk.yaml goss-jdk.yaml
-RUN goss -g - validate < goss-jdk.yaml
+COPY goss-java-app.yaml goss-java-app.yaml
+RUN goss -g - validate < goss-java-app.yaml
 
 #####################################################
 FROM package as vulcheck
@@ -65,6 +72,7 @@ FROM package as vulcheck
 USER root
 ARG token=token
 ADD https://get.aquasec.com/microscanner .
+RUN yum install -y ca-certificates
 RUN chmod +x microscanner
 USER user
 RUN ./microscanner $token > cve-report.txt
@@ -84,4 +92,3 @@ LABEL org.label-schema.name="SpringBoot Test App" \
       io.controlplane.java.version="1.8.0_242" \
       io.control-plane.ci-agent="circleci" \
       io.control-plane.test="goss-passed"
-      

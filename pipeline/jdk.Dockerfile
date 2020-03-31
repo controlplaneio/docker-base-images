@@ -1,14 +1,15 @@
 #####################################################
-FROM controlplane/base:latest as parent
+FROM controlplane/base-centos:latest as parent
 
 USER root
 ENV JAVA_VERSION 1.8.0
-RUN yum update && yum install -y java-"${JAVA_VERSION}"-openjdk java-"${JAVA_VERSION}"-openjdk-devel && yum clean all
+RUN yum update -y && yum install -y java-"${JAVA_VERSION}"-openjdk java-"${JAVA_VERSION}"-openjdk-devel && yum clean all
 ENV JAVA_HOME /etc/alternatives/java_sdk
 USER user
 
 
 #####################################################
+
 FROM parent as test
 
 ENV GOSS_VERSION="v0.3.6"
@@ -18,8 +19,8 @@ RUN \
     \
     curl --fail -L "https://github.com/aelsabbahy/goss/releases/download/${GOSS_VERSION}/goss-linux-amd64" \
     -o /usr/local/bin/goss \
-    && chmod +rx /usr/local/bin/goss 
-  
+    && chmod +rx /usr/local/bin/goss
+
 USER user
 COPY goss-base.yaml goss-base.yaml
 COPY goss-jdk.yaml goss-jdk.yaml
