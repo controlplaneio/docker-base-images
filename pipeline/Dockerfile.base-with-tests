@@ -1,4 +1,4 @@
-
+#####################################################
 FROM centos:8.1.1911 as base
 
 RUN useradd --create-home -s /bin/bash user
@@ -12,9 +12,16 @@ RUN yum -y upgrade \
 
 USER user
 
+#####################################################
+FROM base as hardening
+
+RUN \
+    groupadd --system --gid 30000 user && \
+    useradd --system --shell /sbin/nologin --uid 30000 --gid 30000 user
+
 
 #####################################################
-FROM base as test
+FROM hardening as test
 
 ENV GOSS_VERSION="v0.3.6"
 USER root
@@ -31,7 +38,7 @@ RUN goss -g - validate < goss.yaml
 
 
 #####################################################
-FROM base as final
+FROM hardening as final
 ARG vcs_ref=unespecied
 LABEL org.label-schema.name="Control Plane Base CenOS image" \
       org.label-schema.description="Control Plane Base CenOS image" \

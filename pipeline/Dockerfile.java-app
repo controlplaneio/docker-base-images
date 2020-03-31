@@ -45,21 +45,21 @@ RUN goss -g - validate < goss-base.yaml
 RUN goss -g - validate < goss-jdk.yaml
 RUN goss -g - validate < goss-mvn.yaml
 
-# ####################################################
-FROM package as appTest
-
-ENV GOSS_VERSION="v0.3.6"
-USER root
-RUN \
-    set -x; \
-    \
-    curl --fail -L "https://github.com/aelsabbahy/goss/releases/download/${GOSS_VERSION}/goss-linux-amd64" \
-    -o /usr/local/bin/goss \
-    && chmod +rx /usr/local/bin/goss 
-  
-USER user
-COPY goss-java-app.yaml goss-java-app.yaml
-RUN goss -g - validate < goss-java-app.yaml
+#####################################################
+#FROM package as appTest
+#
+#ENV GOSS_VERSION="v0.3.6"
+#USER root
+#RUN \
+#    set -x; \
+#    \
+#    curl --fail -L "https://github.com/aelsabbahy/goss/releases/download/${GOSS_VERSION}/goss-linux-amd64" \
+#    -o /usr/local/bin/goss \
+#    && chmod +rx /usr/local/bin/goss 
+#  
+#USER user
+#COPY goss-java-app.yaml goss-java-app.yaml
+#RUN goss -g - validate < goss-java-app.yaml
 
 #####################################################
 FROM package as vulcheck
@@ -87,3 +87,4 @@ LABEL org.label-schema.name="SpringBoot Test App" \
       io.controlplane.java.version="1.8.0_242" \
       io.control-plane.ci-agent="circleci" \
       io.control-plane.test="goss-passed"
+      

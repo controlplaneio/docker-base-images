@@ -15,7 +15,7 @@ The pattern is as follows:
 
 ## How do we handle the testing framework?
 
-As we sais above we're using `goss` to test our docker images. Note that there's a difference between testinga  docker image and testing an application. In this repo we include a test that validates the application, but that test is not what we consider a docker image unit test.
+As we sais above we're using `goss` to test our docker images. Note that there's a difference between testing a docker image and testing an application. In this repo we include a test that validates the application, but that test is not what we consider a docker image unit test.
 
 What we do is to create a container using a container image created during a previous stage. We add our testing framework and the set of tests we want to run.
 
