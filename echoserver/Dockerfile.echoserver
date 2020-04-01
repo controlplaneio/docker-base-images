@@ -1,0 +1,18 @@
+FROM hashicorp/http-echo AS http-echo
+
+# ---
+
+ARG BASE_IMAGE_TAG=":latest"
+FROM controlplane/base-centos${BASE_IMAGE_TAG}
+
+LABEL io.k8s.description="ControlPlane Echo Server based on https://hub.docker.com/r/hashicorp/http-echo/" \
+      io.k8s.display-name="ControlPlane Echo Server"
+
+USER root
+
+COPY --from=http-echo /http-echo /http-echo
+
+USER user
+
+EXPOSE 5678/tcp
+ENTRYPOINT ["/http-echo"]

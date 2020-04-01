@@ -1,4 +1,4 @@
-FROM alpine:3.6
+FROM alpine:3.11
 
 LABEL io.k8s.description="control-plane.io base image" \
       io.k8s.display-name="ControlPlane Base"

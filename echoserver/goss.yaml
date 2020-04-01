@@ -1,0 +1,15 @@
+command:
+  /http-echo -version:
+    exit-status: 0
+    stdout: []
+    stderr:
+      - http-echo v0.2.3 (6d116d0+CHANGES)
+    timeout: 1000
+  id:
+    exit-status: 0
+    stdout:
+      - uid=30000(user) gid=30000(user) groups=30000(user)
+    stderr: []
+    timeout: 1000
+
+
