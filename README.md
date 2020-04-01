@@ -9,7 +9,6 @@ Docker base images
   - build server agnostic, makefile-driven
   - intended to model an enterprise build server with different teams owning different images
   - suitable for a PR-based workflow for base image rebuild jobs to raise a PR against descendent images (require a manifest of those image)
-  - 
 - the underlying build server doesn't matter
 - business process and workflows, especially responses to vulnerabilities, are not in scope
   - bureaucracy and politics are the killers to this workflow

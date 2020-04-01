@@ -11,6 +11,7 @@ USER root
 RUN \
     apk \
       add \
+      --verbose \
       --no-cache \
       --repository "http://dl-3.alpinelinux.org/alpine/edge/main" \
       --repository "http://dl-3.alpinelinux.org/alpine/edge/community" \
