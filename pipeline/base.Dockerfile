@@ -1,17 +1,19 @@
 #####################################################
+FROM instrumenta/conftest as pre-start
 
+COPY . /project
+RUN conftest test -i Dockerfile base.Dockerfile
+# RUN conftest test -i Dockerfile --namespace commands base.Dockerfile
+
+
+#####################################################
 FROM centos:8.1.1911 as base
-
-RUN useradd --create-home -s /bin/bash user
-
-WORKDIR /home/user
 
 USER root
 RUN yum -y upgrade \
     && rm -rf /var/cache/yum \
     && yum clean all
 
-USER user
 
 #####################################################
 FROM base as hardening
@@ -19,6 +21,8 @@ FROM base as hardening
 RUN \
     groupadd --system --gid 30000 user && \
     useradd --system --shell /sbin/nologin --uid 30000 --gid 30000 user
+
+WORKDIR /home/user
 
 
 #####################################################

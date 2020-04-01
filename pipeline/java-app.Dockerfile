@@ -1,4 +1,12 @@
 #####################################################
+FROM instrumenta/conftest as pre-start
+
+COPY . /project
+RUN conftest test -i Dockerfile base.Dockerfile
+RUN conftest test -i Dockerfile --namespace commands base.Dockerfile
+
+
+#####################################################
 FROM controlplane/mvn:3.6.3 as parent
 
 WORKDIR /home/user
