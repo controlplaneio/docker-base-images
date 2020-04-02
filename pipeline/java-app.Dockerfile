@@ -1,4 +1,6 @@
 #####################################################
+# Pre-Start stage: Validating the Dockerfile
+#####################################################
 FROM instrumenta/conftest as pre-start
 
 COPY . /project
@@ -6,6 +8,8 @@ RUN conftest test -i Dockerfile base.Dockerfile
 RUN conftest test -i Dockerfile --namespace commands base.Dockerfile
 
 
+#####################################################
+# Parent stage: Build stage
 #####################################################
 FROM controlplane/mvn:3.6.3 as parent
 
@@ -27,7 +31,9 @@ RUN curl -OL https://github.com/spring-guides/gs-spring-boot/archive/2.1.6.RELEA
 
 USER user
 
-#####################################################
+################################################################################
+# Assembly stage: This is where the imade will be assembled for production
+################################################################################
 
 FROM controlplane/openjdk:8-jdk as package
 COPY --from=parent  /home/user/myapp/complete/target/gs-spring-boot-0.1.0.jar /home/user/gs-spring-boot-0.1.0.jar
@@ -36,6 +42,8 @@ ENTRYPOINT ["java","-jar","/home/user/gs-spring-boot-0.1.0.jar"]
 
 
 ####################################################
+# Unit test stage: Run GOSS unit tests
+#####################################################
 FROM parent as test
 
 ENV GOSS_VERSION="v0.3.6"
@@ -59,6 +67,8 @@ RUN goss -g - validate < goss-jdk.yaml
 RUN goss -g - validate < goss-mvn.yaml
 
 # ####################################################
+# Unit test stage: Run GOSS unit tests
+#####################################################
 FROM package as appTest
 
 ENV GOSS_VERSION="v0.3.6"
@@ -75,6 +85,8 @@ COPY goss-java-app.yaml goss-java-app.yaml
 RUN goss -g - validate < goss-java-app.yaml
 
 #####################################################
+# Vulnerability Checking stage: Run microscanner
+#####################################################
 FROM package as vulcheck
 
 USER root
@@ -86,6 +98,8 @@ USER user
 RUN ./microscanner $token > cve-report.txt
 
 
+#####################################################
+# Final stage: Add metadata only
 #####################################################
 FROM package as final
 

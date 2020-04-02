@@ -1,4 +1,6 @@
 #####################################################
+# Pre-Start stage: Validating the Dockerfile
+#####################################################
 FROM instrumenta/conftest as pre-start
 
 COPY . /project
@@ -6,6 +8,8 @@ RUN conftest test -i Dockerfile base.Dockerfile
 # RUN conftest test -i Dockerfile --namespace commands base.Dockerfile
 
 
+#####################################################
+# Parent stage: Build stage
 #####################################################
 FROM centos:8.1.1911 as base
 
@@ -15,7 +19,10 @@ RUN yum -y upgrade \
     && yum clean all
 
 
-#####################################################
+###########################################################################
+# Hardening stage: This stage can be merged with the build stage but
+#                   It's separated for clarity
+###########################################################################
 FROM base as hardening
 
 RUN \
@@ -25,6 +32,8 @@ RUN \
 WORKDIR /home/user
 
 
+#####################################################
+# Unit test stage: Run GOSS unit tests
 #####################################################
 FROM hardening as test
 
@@ -44,7 +53,8 @@ RUN goss -g - validate < goss.yaml
 
 
 #####################################################
-
+# Final stage: Add metadata only
+#####################################################
 FROM hardening as final
 
 ARG vcs_ref=unespecied
