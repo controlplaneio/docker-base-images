@@ -5,7 +5,7 @@ FROM instrumenta/conftest as pre-start
 
 COPY . /project
 RUN conftest test -i Dockerfile base.Dockerfile
-RUN conftest test -i Dockerfile --namespace commands base.Dockerfile
+# RUN conftest test -i Dockerfile --namespace commands base.Dockerfile
 
 
 #####################################################
@@ -66,7 +66,7 @@ RUN goss -g - validate < goss-base.yaml
 RUN goss -g - validate < goss-jdk.yaml
 RUN goss -g - validate < goss-mvn.yaml
 
-# ####################################################
+#####################################################
 # Unit test stage: Run GOSS unit tests
 #####################################################
 FROM package as appTest
@@ -92,7 +92,6 @@ FROM package as vulcheck
 USER root
 ARG token=token
 ADD https://get.aquasec.com/microscanner .
-RUN yum install -y ca-certificates
 RUN chmod +x microscanner
 USER user
 RUN ./microscanner $token > cve-report.txt
