@@ -50,7 +50,8 @@ RUN \
 USER user
 COPY goss-base.yaml goss.yaml
 RUN goss -g - validate < goss.yaml
-
+COPY goss-hamlet-test.yaml goss-hamlet.yaml
+RUN goss -g - validate < goss-hamlet.yaml
 
 #####################################################
 # Final stage: Add metadata only

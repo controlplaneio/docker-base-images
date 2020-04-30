@@ -1,0 +1,39 @@
+port:
+  tcp:22:
+    listening: false
+    ip:
+    - 0.0.0.0
+  tcp:6010:
+    listening: false
+    ip:
+    - 0.0.0.0
+  tcp:6011:
+    listening: false
+    ip:
+    - 0.0.0.0
+  tcp:6012:
+    listening: false
+    ip:
+    - 0.0.0.0
+service:
+  sshd:
+    enabled: false
+    running: false
+user:
+  sshd:
+    exists: false
+    uid: 74
+    gid: 74
+    groups:
+    - sshd
+    home: /var/empty/sshd
+    shell: /sbin/nologin
+
+group:
+  sshd:
+    exists: false
+    gid: 74
+
+process:
+  sshd:
+    running: false
