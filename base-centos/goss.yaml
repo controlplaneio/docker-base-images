@@ -10,7 +10,7 @@ user:
     gid: 30000
     groups:
       - user
-    home:
+    home: /home/user
     shell: /sbin/nologin
 group:
   user:

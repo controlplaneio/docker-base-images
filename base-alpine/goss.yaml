@@ -3,7 +3,21 @@ file:
     exists: true
     filetype: file
     contains:
-    - "3.6.3"
+    - "3.11.6"
   /etc/os-release:
     exists: true
     filetype: file
+user:
+  user:
+    exists: true
+    uid: 30000
+    gid: 30000
+    groups:
+      - user
+    home: "/home/user"
+    shell: /sbin/nologin
+group:
+  user:
+    exists: true
+    gid: 30000
+

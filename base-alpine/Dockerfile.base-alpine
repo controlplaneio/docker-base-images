@@ -5,7 +5,15 @@ LABEL io.k8s.description="control-plane.io base image" \
 
 ENV GOSS_VERSION="v0.3.6"
 
-RUN adduser -h /home/user -s /bin/sh -D user
+RUN addgroup --gid 30000 user && \
+      adduser \
+        --home /home/user \
+        --shell /sbin/nologin \
+        --disabled-password \
+        --ingroup user  \
+        --uid 30000 \
+        --gecos "" \
+        user
 
 WORKDIR /home/user
 

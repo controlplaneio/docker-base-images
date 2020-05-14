@@ -129,6 +129,8 @@ build-base-centos: ## build base centos image
 	@echo "+ $@"
 	$(call build_image,$(CONTAINER_NAME_BASE_CENTOS),base-centos/Dockerfile.base-centos)
 
+# ---
+
 .PHONY: build-jre
 build-jre: ## build JRE image
 	@echo "+ $@"
@@ -146,13 +148,15 @@ test: ## test all base images
 	@echo "+ $@"
 	$(call make_parallel,$(TEST_JOBS_ALL))
 
+# ---
+
 .PHONY: test-base-ubuntu
 test-base-ubuntu: ## test base ubuntu image
 	@echo "+ $@"
 	$(call test_image,base-ubuntu,$(CONTAINER_NAME_BASE_UBUNTU))
 
 .PHONY: test-base-alpine
-test-base: ## test base alpine image
+test-base-alpine: ## test base alpine image
 	@echo "+ $@"
 	$(call test_image,base-alpine,$(CONTAINER_NAME_BASE_ALPINE))
 
@@ -160,6 +164,8 @@ test-base: ## test base alpine image
 test-base-centos: ## test base centos image
 	@echo "+ $@"
 	$(call test_image,base-centos,$(CONTAINER_NAME_BASE_CENTOS))
+
+# ---
 
 .PHONY: test-jre
 test-jre: ## test JRE image
@@ -201,6 +207,8 @@ push-base-alpine: ## push base alpine image
 push-base-centos: ## push base centos image
 	@echo "+ $@"
 	$(call push_image,$(CONTAINER_NAME_BASE_CENTOS))
+
+# ---
 
 .PHONY: push-jre
 push-jre: ## push JRE image
