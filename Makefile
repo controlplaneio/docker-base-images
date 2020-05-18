@@ -4,10 +4,12 @@ BUILD_DATE := $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
 GIT_SHA := $(shell git log -1 --format=%h)
 GIT_TAG ?= $(shell bash -c 'TAG=$$(git tag | tail -n1); echo "$${TAG:-none}"')
 GIT_MESSAGE := $(shell git -c log.showSignature=false log --max-count=1 --pretty=format:"%H")
-GIT_UNTRACKED_CHANGES := $(shell git status --porcelain --untracked-files=no)
+GIT_UNTRACKED_CHANGES := $(shell git status --porcelain)
 ifneq ($(GIT_UNTRACKED_CHANGES),)
+    GIT_COMMIT := $(GIT_COMMIT)-dirty
+    ifneq ($(GIT_TAG),dev)
         GIT_TAG := $(GIT_TAG)-dirty
-        GIT_SHA := $(GIT_SHA)-dirty
+    endif
 endif
 
 CONTAINER_TAG ?= $(GIT_SHA)
