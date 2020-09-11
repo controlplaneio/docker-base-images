@@ -1,4 +1,5 @@
 NAME := base
+BUILD_STEP_PATH := build-step
 REGISTRY := docker.io/controlplane
 BUILD_DATE := $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
 GIT_SHA := $(shell git log -1 --format=%h)
@@ -22,6 +23,11 @@ CONTAINER_NAME_BASE_UBUNTU := $(REGISTRY)/$(NAME)-ubuntu:$(CONTAINER_TAG)
 CONTAINER_NAME_BASE_ALPINE := $(REGISTRY)/$(NAME)-alpine:$(CONTAINER_TAG)
 CONTAINER_NAME_BASE_CENTOS := $(REGISTRY)/$(NAME)-centos:$(CONTAINER_TAG)
 
+CONTAINER_NAME_BUILD_ENV_BASE := $(REGISTRY)/$(BUILD_STEP_PATH)-build-env-base:$(CONTAINER_TAG)
+CONTAINER_NAME_CONFORM := $(REGISTRY)/$(BUILD_STEP_PATH)-conform:$(CONTAINER_TAG)
+CONTAINER_NAME_GIT_SECRETS := $(REGISTRY)/$(BUILD_STEP_PATH)-git-secrets:$(CONTAINER_TAG)
+CONTAINER_NAME_HADOLINT := $(REGISTRY)/$(BUILD_STEP_PATH)-hadolint:$(CONTAINER_TAG)
+
 CONTAINER_NAME_JRE := $(REGISTRY)/$(NAME)-jre:$(CONTAINER_TAG)
 CONTAINER_NAME_ECHOSERVER := $(REGISTRY)/$(NAME)-echoserver:$(CONTAINER_TAG)
 CONTAINER_NAME_TEST := $(REGISTRY)-$(NAME)-test-$(CONTAINER_TAG)
@@ -30,6 +36,12 @@ BUILD_JOBS_BASE := \
 	build-base-alpine \
 	build-base-centos \
 	build-base-ubuntu
+
+BUILD_JOBS_BUILD_STEP := \
+    build-build-env-base \
+	build-git-secrets \
+	build-conform \
+	build-hadolint
 
 BUILD_JOBS_INHERITED := \
 	build-jre \
@@ -68,7 +80,7 @@ define build_image
 			--rm=true \
 			--file=$(2) \
 			--build-arg BASE_IMAGE_TAG="$${BASE_IMAGE_TAG}" \
-			.
+			$(3)
 endef
 
 define test_image
@@ -116,32 +128,57 @@ build: ## build all base images
 	$(call make_parallel,$(BUILD_JOBS_BASE))
 	$(call make_parallel,$(BUILD_JOBS_INHERITED))
 
+.PHONY: build-build-step
+build-build-step: ## build build step images
+	@echo "+ $@"
+	$(call make_parallel,$(BUILD_JOBS_BUILD_STEP))
+
 .PHONY: build-base-ubuntu
 build-base-ubuntu: ## build ubuntu base image
 	@echo "+ $@"
-	$(call build_image,$(CONTAINER_NAME_BASE_UBUNTU),base-ubuntu/Dockerfile.base-ubuntu)
+	$(call build_image,$(CONTAINER_NAME_BASE_UBUNTU),base-ubuntu/Dockerfile.base-ubuntu,.)
 
 .PHONY: build-base-alpine
 build-base-alpine: ## build base alpine image
 	@echo "+ $@"
-	$(call build_image,$(CONTAINER_NAME_BASE_ALPINE),base-alpine/Dockerfile.base-alpine)
+	$(call build_image,$(CONTAINER_NAME_BASE_ALPINE),base-alpine/Dockerfile.base-alpine,.)
 
 .PHONY: build-base-centos
 build-base-centos: ## build base centos image
 	@echo "+ $@"
-	$(call build_image,$(CONTAINER_NAME_BASE_CENTOS),base-centos/Dockerfile.base-centos)
+	$(call build_image,$(CONTAINER_NAME_BASE_CENTOS),base-centos/Dockerfile.base-centos,.)
+
+.PHONY: build-build-env-base
+build-build-env-base: ## build build env base image
+	@echo "+ $@"
+	$(call build_image,$(CONTAINER_NAME_BUILD_ENV_BASE),build-step/build-env-base/Dockerfile,./build-step/build-env-base)
+
+.PHONY: build-git-secrets
+build-git-secrets: ## build git secrets image
+	@echo "+ $@"
+	$(call build_image,$(CONTAINER_NAME_GIT_SECRETS),build-step/git-secrets/Dockerfile,./build-step/git-secrets)
+
+.PHONY: build-conform
+build-conform: ## build conform image
+	@echo "+ $@"
+	$(call build_image,$(CONTAINER_NAME_CONFORM),build-step/conform/Dockerfile,./build-step/conform/)
+
+.PHONY: build-hadolint
+build-hadolint: ## build hadolint image
+	@echo "+ $@"
+	$(call build_image,$(CONTAINER_NAME_HADOLINT),build-step/hadolint/Dockerfile,./build-step/hadolint/)
 
 # ---
 
 .PHONY: build-jre
 build-jre: ## build JRE image
 	@echo "+ $@"
-	$(call build_image,$(CONTAINER_NAME_JRE),jre/Dockerfile.jre)
+	$(call build_image,$(CONTAINER_NAME_JRE),jre/Dockerfile.jre,.)
 
 .PHONY: build-echoserver
 build-echoserver: ## build echoserver image
 	@echo "+ $@"
-	$(call build_image,$(CONTAINER_NAME_ECHOSERVER),echoserver/Dockerfile.echoserver)
+	$(call build_image,$(CONTAINER_NAME_ECHOSERVER),echoserver/Dockerfile.echoserver,.)
 
 # ---
 
