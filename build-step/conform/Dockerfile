@@ -4,7 +4,7 @@ FROM autonomy/conform:latest AS source
 
 # ===
 
-FROM controlplaneio/build-env-base:ajm-test AS build-step
+FROM controlplane/build-step-build-env-base:latest AS build-step
 
 # ===
 
