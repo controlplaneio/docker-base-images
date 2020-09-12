@@ -32,13 +32,15 @@ CONTAINER_NAME_JRE := $(REGISTRY)/$(NAME)-jre:$(CONTAINER_TAG)
 CONTAINER_NAME_ECHOSERVER := $(REGISTRY)/$(NAME)-echoserver:$(CONTAINER_TAG)
 CONTAINER_NAME_TEST := $(REGISTRY)-$(NAME)-test-$(CONTAINER_TAG)
 
+# ---
+
 BUILD_JOBS_BASE := \
 	build-base-alpine \
 	build-base-centos \
 	build-base-ubuntu
 
 BUILD_JOBS_BUILD_STEP := \
-    build-build-env-base \
+  build-build-env-base \
 	build-git-secrets \
 	build-conform \
 	build-hadolint
@@ -59,7 +61,11 @@ PUSH_JOBS_ALL := \
 	push-base-centos \
 	push-base-ubuntu \
 	push-jre \
-	push-echoserver
+	push-echoserver \
+	push-build-env-base \
+	push-git-secrets \
+	push-conform \
+	push-hadolint
 
 export NAME REGISTRY BUILD_DATE GIT_SHA GIT_TAG GIT_MESSAGE CONTAINER_NAME CONTAINER_TAG
 
@@ -246,6 +252,28 @@ push-base-alpine: ## push base alpine image
 push-base-centos: ## push base centos image
 	@echo "+ $@"
 	$(call push_image,$(CONTAINER_NAME_BASE_CENTOS))
+
+# ---
+
+.PHONY: push-build-env-base
+push-build-env-base: ## push build-env-base image
+	@echo "+ $@"
+	$(call push_image,$(CONTAINER_NAME_BUILD_ENV_BASE))
+
+.PHONY: push-git-secrets
+push-git-secrets: ## push GIT_SECRETS image
+	@echo "+ $@"
+	$(call push_image,$(CONTAINER_NAME_GIT_SECRETS))
+
+.PHONY: push-conform
+push-conform: ## push CONFORM image
+	@echo "+ $@"
+	$(call push_image,$(CONTAINER_NAME_CONFORM))
+
+.PHONY: push-hadolint
+push-hadolint: ## push HADOLINT image
+	@echo "+ $@"
+	$(call push_image,$(CONTAINER_NAME_HADOLINT))
 
 # ---
 
