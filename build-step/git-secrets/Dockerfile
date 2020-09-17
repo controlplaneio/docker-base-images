@@ -36,18 +36,14 @@ RUN curl -sLo gitleaks https://github.com/zricethezav/gitleaks/releases/download
     && chmod a+x gitleaks \
     && mv gitleaks /usr/local/bin/gitleaks
 
-RUN curl -sLo scanrepo https://github.com/UKHomeOffice/repo-security-scanner/releases/download/0.4.0/scanrepo-0.4.0-linux-amd64.tar.gz \
-    && tar -xvf scanrepo \
-    && mv scanrepo /usr/local/bin/scanrepo
-
 RUN pip3 install gitdb2==3.0.0 truffleHog==2.0.99 gittyleaks==0.0.31
 
-COPY secrets.sh /secrets.sh
+COPY scan.sh /scan.sh
 
 COPY --from=build-step \
   /build-step/entrypoint.sh \
   /build-step/harden.sh \
   /
-ENV COMMAND="/secrets.sh"
+ENV COMMAND="/scan.sh"
 
 ENTRYPOINT [ "/entrypoint.sh" ]
