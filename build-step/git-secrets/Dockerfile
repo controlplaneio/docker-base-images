@@ -51,5 +51,3 @@ COPY --from=build-step \
 ENV COMMAND="/secrets.sh"
 
 ENTRYPOINT [ "/entrypoint.sh" ]
-
-# Suggested run invocation: docker run --rm -v $(pwd):/code -it secrets

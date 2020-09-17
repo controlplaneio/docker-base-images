@@ -133,6 +133,7 @@ build: ## build all base images
 	@echo "+ $@"
 	$(call make_parallel,$(BUILD_JOBS_BASE))
 	$(call make_parallel,$(BUILD_JOBS_INHERITED))
+	$(call make_parallel,$(BUILD_JOBS_BUILD_STEP))
 
 .PHONY: build-build-step
 build-build-step: ## build build step images
