@@ -80,6 +80,7 @@ all: build test ## build and test all base images
 define build_image
 	set -x;
 #	docker run --rm -i hadolint/hadolint < $(2) | grep --color=always '.*'
+	grep '^FROM' $(2) | sed -E 's/^FROM ([^ ]+).*/\1/' | xargs -n 1 docker pull
 	BASE_IMAGE_TAG=$(BASE_IMAGE_TAG); \
 		docker build \
 			--tag "$(1)" \
