@@ -2,7 +2,7 @@
 
 @Library('jenkins-shared-library') _
 
-pipelineDemo([
+pipelineImageBuild([
   stages: [
     gitSecrets          : true,
     gitCommitConformance: true,
