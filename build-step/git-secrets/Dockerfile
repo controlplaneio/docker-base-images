@@ -32,7 +32,7 @@ RUN git clone  https://github.com/awslabs/git-secrets \
     && cd .. \
     && rm -rf git-secrets
 
-RUN curl -sLo gitleaks https://github.com/zricethezav/gitleaks/releases/download/v4.3.1/gitleaks-linux-amd64 \
+RUN curl -sLo gitleaks https://github.com/zricethezav/gitleaks/releases/download/v6.1.2/gitleaks-linux-amd64 \
     && chmod a+x gitleaks \
     && mv gitleaks /usr/local/bin/gitleaks
 
