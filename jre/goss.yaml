@@ -6,4 +6,4 @@ command:
     stderr:
     - /^openjdk version "1.8.*/
     - /^OpenJDK 64-Bit Server VM .*/
-    timeout: 1000
+    timeout: 2000
